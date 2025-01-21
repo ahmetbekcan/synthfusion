@@ -15,24 +15,33 @@ generator = torch.Generator(device=device)
 
 audio_diffusion = AudioDiffusion(model_id="ahmetbekcan/synthfusion-256")
 audio_encoder = AudioEncoder.from_pretrained("teticio/audio-encoder")
+condition_path = "audio-condition-input/moog-synth.wav"
 
-file_path = os.path.abspath("audio-condition-input/dx7-synth.mp3")
-encoding = torch.unsqueeze(audio_encoder.encode([file_path]),
-                           axis=1).to(device)
 output_dir = "outputs"
+number_of_outputs = 1
 
-for _ in range(3):
-    seed = generator.seed()
-    print(f'Seed = {seed}')
-    generator.manual_seed(seed)
-    image, (sample_rate,
-            audio) = audio_diffusion.generate_spectrogram_and_audio(
-                generator=generator, encoding=encoding)
-    spectrogram_file = os.path.join(output_dir, f"output_spectrogram_seed_{seed}.png")
-    plt.imsave(spectrogram_file, image)
-    print(f"Saved spectrogram: {spectrogram_file}")
+condition_path = "audio-condition-input/"
+for file_name in os.listdir(condition_path):
+    if not file_name.endswith('.wav'):
+        continue
     
-    # Save audio as a .wav file
-    audio_file = os.path.join(output_dir, f"output_audio_seed_{seed}.wav")
-    sf.write(audio_file, audio, sample_rate)
-    print(f"Saved audio: {audio_file}")
+    audio_file = os.path.join(condition_path, file_name)
+    encoding = torch.unsqueeze(audio_encoder.encode([audio_file]),
+                           axis=1).to(device)
+    for _ in range(number_of_outputs):
+        os.path.splitext(os.path.basename(audio_file))[0]
+        seed = generator.seed()
+        print(f'Seed = {seed}')
+        generator.manual_seed(seed)
+        image, (sample_rate,
+                audio) = audio_diffusion.generate_spectrogram_and_audio(
+                    generator=generator, encoding=encoding)
+        audio_file_name = os.path.splitext(os.path.basename(audio_file))[0]
+        spectrogram_file = os.path.join(output_dir, f"{audio_file_name}_output_spectrogram_seed_{seed}.png")
+        plt.imsave(spectrogram_file, image)
+        print(f"Saved spectrogram: {spectrogram_file}")
+        
+        # Save audio as a .wav file
+        audio_file = os.path.join(output_dir, f"{audio_file_name}_output_audio_seed_{seed}.wav")
+        sf.write(audio_file, audio, sample_rate)
+        print(f"Saved audio: {audio_file}")
