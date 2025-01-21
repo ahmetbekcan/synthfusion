@@ -1,7 +1,7 @@
 # Synthfusion
 (This repository is based on the https://github.com/teticio/audio-diffusion)
 
-Synthesizer sound generation using laten diffusion conditioned on audio encodings. Output quality is low since it was trained on a relatively small dataset. However, it would be a nice idea to reproduce some synthesizer sound given example audio samples. Some output examples can be seen in the "outputs" folder
+Synthesizer sound generation using latent diffusion conditioned on audio encodings. Output quality is low since it was trained on a relatively small dataset. However, it would be a nice idea to reproduce some synthesizer sounds given example audio samples. Some output examples can be seen in the "outputs" folder.
 
 ## How to run
 
